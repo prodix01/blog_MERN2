@@ -1,26 +1,44 @@
 const express = require("express");
 const router = express.Router();
 
-//회원가입
+// @route   POST    http://localhost:1234/users/register
+// @desc    register user
+// @access  public
+router.post("/register", (req, res) =>{
+
+});
 
 
 
 
 
-//로그인
+// @route   POST    http://localhost:1234/users/login
+// @desc    login user
+// @access  public
+router.post("/login", (req, res) => {
+
+});
 
 
 
 
 
-//회원탈퇴
+// @route   DELETE    http://localhost:1234/register
+// @desc    delete userInfo
+// @access  private
+router.delete("/:user_id", (req, res) => {
+
+});
 
 
 
 
+// @route   GET    http://localhost:1234/users
+// @desc    get userInfo
+// @access  private
+router.get("/", (req, res) => {
 
-//회원정보 불러오기
-
+});
 
 
 
