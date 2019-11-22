@@ -3,9 +3,12 @@ const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const passport = require("passport");
 
 
 const userModel = require("../models/users");
+
+const auth_check = passport.authenticate("jwt", {session : false});
 
 // @route   POST    http://localhost:1234/users/register
 // @desc    register user
@@ -139,8 +142,12 @@ router.delete("/:user_id", (req, res) => {
 // @route   GET    http://localhost:1234/users
 // @desc    get userInfo
 // @access  private
-router.get("/", (req, res) => {
-
+router.get("/", auth_check, (req, res) => {
+    res.status(200).json({
+        id : req.user.id,
+        name : req.user.name,
+        avatar : req.user.avatar
+    });
 });
 
 
