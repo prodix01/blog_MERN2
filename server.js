@@ -7,4 +7,4 @@ require("./db");
 const server = http.createServer(app);
 const PORT = process.env.PORT;
 
-server.listen(console.log(PORT, `http://localhost:${PORT} 로 서버를 시작합니다.`));
+server.listen(PORT, console.log(`http://localhost:${PORT} 로 서버를 시작합니다.`));
