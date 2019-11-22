@@ -1,0 +1,30 @@
+{
+  "name": "blog_mern2",
+  "version": "1.0.0",
+  "description": "blog_MERN2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prodix01/blog_MERN2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prodix01/blog_MERN2/issues"
+  },
+  "homepage": "https://github.com/prodix01/blog_MERN2#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.7.12",
+    "morgan": "^1.9.1"
+  }
+}
