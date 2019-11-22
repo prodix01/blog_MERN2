@@ -65,6 +65,44 @@ router.post("/register", (req, res) =>{
 // @access  public
 router.post("/login", (req, res) => {
 
+    userModel
+        .findOne({email : req.body.email})
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({
+                    msg : "No emailInfo"
+                });
+            }
+            else {
+                //패스워드 매칭
+                bcrypt
+                    .compare(req.body.password, user.password)
+                    .then(isMatch => {
+                        if (!isMatch) {
+                            return res.status(400).json({
+                                msg : "패스워드 불일치"
+                            });
+                        }
+                        else {
+                            res.status(200).json({
+                                msg : "로그인 성공 (토큰 변환)"
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        res.status(400).json({
+                            error : err.message
+                        });
+                    });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error : err.message
+            });
+    });
+
+
 });
 
 
