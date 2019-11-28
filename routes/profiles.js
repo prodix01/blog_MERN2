@@ -5,6 +5,8 @@ const passport = require("passport");
 const userModel = require("../models/users");
 const profileModel = require("../models/profiles");
 
+const validateProfileInput = require("../validation/profile");
+
 const auth_check = passport.authenticate("jwt", {session : false});
 
 
@@ -14,6 +16,14 @@ const auth_check = passport.authenticate("jwt", {session : false});
 // @desc    post profile
 // @access  private
 router.post("/", auth_check, (req, res) => {
+
+    const {errors, isValid} = validateProfileInput(req.body);
+
+    //check validate
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
 
     //Get fields
     const profileFields = {};
@@ -34,26 +44,36 @@ router.post("/", auth_check, (req, res) => {
     profileModel
         .findOne({user : req.user.id})
         .then(profile => {
-            new profileModel(profileFields)
-                .save()
-                .then(profile => {
-                    res.status(200).json({
-                        msg : "성공적으로 프로필을 등록했습니다.",
-                        profileInfo : profile
+            if (profile) {
+                profileModel
+                    .findOneAndUpdate(
+                        {user : req.user.id},
+                        {$set : profileFields},
+                        {new : true}
+                    )
+                    .then(profile => {
+                        res.status(200).json({
+                            msg : "update profileInfo",
+                            profileInfo : profile
+                        });
                     });
-                })
-                .catch(err => {
-                    res.status(400).json({
-                        error : err.message
+            }
+            else {
+                new profileModel(profileFields)
+                    .save()
+                    .then(profile => {
+                        res.status(200).json({
+                            msg : "성공적으로 프로필을 등록했습니다.",
+                            profileInfo : profile
+                        });
+                    })
+                    .catch(err => {
+                        res.status(400).json({
+                            error : err.message
+                        });
                     });
-                });
-        })
-        .catch(err => {
-            res.status(500).json({
-                error : err.message
-            });
+                  }
         });
-
 });
 
 
@@ -66,6 +86,22 @@ router.post("/", auth_check, (req, res) => {
 // @access  private
 router.get("/", auth_check, (req, res) => {
 
+    profileModel
+        .findOne({user : req.user.id})
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg : "이 유저에는 프로필이 등록되지 않았습니다."
+                });
+            }
+            else {
+                res.status(200).json({
+                    msg : "성공적으로 프로필 정보를 불러왔습니다.",
+                    profileInfo : profile
+                });
+            }
+        });
+
 });
 
 
@@ -76,7 +112,44 @@ router.get("/", auth_check, (req, res) => {
 // @access  private
 router.delete("/", auth_check, (req, res) => {
 
+    profileModel
+        .remove({user : req.user.id})
+        .then(profile => {
+            res.status(200).json({
+                msg : "성공적으로 프로필 정보를 삭제했습니다."
+            });
+        });
+
 });
+
+
+
+
+// @route GET profiles/handle/:handle
+// @desc Get profile by handle
+// @ public
+router.get("/handle/:handle", (req, res) =>{
+    profileModel
+        .findOne({handle : req.params.handle})
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg : "이 유저는 프로필정보가 없습니다."
+                });
+            }
+            else {
+                res.status(200).json({
+                    result : true,
+                    count : profile.length,
+                    profileInfo : profile
+                });
+            }
+        });
+});
+
+
+
+
 
 
 

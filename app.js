@@ -25,4 +25,15 @@ app.use("/users", userRoutes);
 app.use("/profiles", profileRoutes);
 app.use("/posts", postRoutes);
 
+
+//모든 에러코드 500 은 error.message 를 보냄
+app.use((error, req, res, next) => {
+    res.status(error.status || 500);
+    res.json({
+        error : {
+            msg : error.message
+        }
+    });
+});
+
 module.exports = app;

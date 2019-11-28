@@ -41,16 +41,8 @@ exports.user_register = (req, res) =>{
                         userInfo : user
                     })
                 })
-                .catch(err => {
-                    errors.msg = err.message;
-                    res.status(500).json(errors);
-                });
 
-        })
-        .catch(err => {
-           res.status(500).json({
-               error : err.message
-           });
+
         });
 
 };
@@ -122,12 +114,8 @@ exports.user_login = (req, res) => {
                         });
                     });
             }
-        })
-        .catch(err => {
-            res.status(500).json({
-                error : err.message
-            });
         });
+
 };
 
 
