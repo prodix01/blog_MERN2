@@ -32,10 +32,10 @@ router.get("/", auth_check, (req, res) => {
 
 
 //프로필 삭제하기
-// @route   remove    http://localhost:1234/users/:user_id
+// @route   delete    http://localhost:1234/users/:user_id
 // @desc    delete profile
 // @access  private
-router.remove("/", auth_check, (req, res) => {
+router.delete("/", auth_check, (req, res) => {
 
 });
 

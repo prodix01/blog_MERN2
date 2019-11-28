@@ -41,3 +41,5 @@ const profileSchema = mongoose.Schema({
         default : Date.now
     }
 });
+
+module.exports = mongoose.model("profile", profileSchema);
