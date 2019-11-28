@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/users");
 
 const validateRegisterInput = require("../validation/register");
+const validateLoginInput = require("../validation/login");
 
 //회원가입
 exports.user_register = (req, res) =>{
@@ -71,13 +72,23 @@ exports.user_register = (req, res) =>{
 //로그인
 exports.user_login = (req, res) => {
 
+    const {errors, isValid} = validateLoginInput(req.body);
+
+    //check validation
+    if (!isValid) {
+        res.status(400).json(errors)
+    }
+
     userModel
         .findOne({email : req.body.email})
         .then(user => {
             if (!user) {
-                return res.status(404).json({
-                    msg : "No emailInfo"
-                });
+                errors.msg = "이메일 정보가 없습니다.";
+                return res.status(400).json(errors);
+
+                // return res.status(404).json({
+                //     msg : "No emailInfo"
+                // });
             }
             else {
                 //패스워드 매칭
@@ -85,9 +96,11 @@ exports.user_login = (req, res) => {
                     .compare(req.body.password, user.password)
                     .then(isMatch => {
                         if (!isMatch) {
-                            return res.status(400).json({
-                                msg : "패스워드 불일치"
-                            });
+                            errors.msg = "패스워드 불일치";
+                            return res.status(400).json(errors);
+                            // return res.status(400).json({
+                            //     msg : "패스워드 불일치"
+                            // });
                         }
                         else {
                             //토큰에 들어갈 유저정보
