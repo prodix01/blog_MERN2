@@ -27,40 +27,33 @@ exports.user_register = (req, res) =>{
                 //     msg : "이메일이 이미 있습니다."
                 // });
             }
-            const avatar = gravatar.url(req.body.email, {
-                s : 200,     //size
-                r : "pg",    //rating
-                d : "mm",   //default
-            });
+
             const newUser = new userModel({
                 name : req.body.name,
                 email : req.body.email,
-                avatar : avatar,
                 password : req.body.password
             });
 
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                    if (err) throw err;
-                    newUser.password = hash;
-
-                    newUser
-                        .save()
-                        .then(user => {
-                            res.status(200).json({
-                                msg : "회원가입에 성공했습니다.",
-                                registerInfo : user
-                            });
-                        })
-                        .catch(err => {
-                            res.status(500).json({
-                                error : err.message
-                            });
-                        });
-
+            newUser
+                .save()
+                .then(user => {
+                    res.status(200).json({
+                        msg : "회원가입성공",
+                        userInfo : user
+                    })
+                })
+                .catch(err => {
+                    errors.msg = err.message;
+                    res.status(500).json(errors);
                 });
-            });
+
+        })
+        .catch(err => {
+           res.status(500).json({
+               error : err.message
+           });
         });
+
 };
 
 
