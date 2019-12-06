@@ -101,10 +101,19 @@ exports.get_profile = (req, res) => {
 exports.delete_profile = (req, res) => {
 
     profileModel
-        .remove({user : req.user.id})
-        .then(profile => {
-            res.status(200).json({
-                msg : "성공적으로 프로필 정보를 삭제했습니다."
+        .findByIdAndRemove({ _id : req.user.id})
+        .then(() => {
+            userModel
+                .findByIdAndRemove({id : req.user.id})
+                .then(() => {
+                    res.status(200).json({
+                        msg : "Delete profile"
+                    });
+                });
+        })
+        .catch(err => {
+            res.status(404).json({
+                error : err.message
             });
         });
 
