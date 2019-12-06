@@ -6,8 +6,7 @@ const auth_check = passport.authenticate("jwt", {session : false});
 
 const profileController = require("../controllers/profiles");
 
-const validateExpInput = require("../validation/experience");
-const validateEduInput = require("../validation/education");
+
 
 const profileModel = require("../models/profiles");
 

@@ -6,6 +6,8 @@ const auth_check = passport.authenticate("jwt", {session : false});
 
 const validatePostInput = require("../validation/post");
 
+const postController = require("../controllers/posts");
+
 const postModel = require("../models/posts");
 const profileModel = require("../models/profiles");
 
@@ -13,60 +15,14 @@ const profileModel = require("../models/profiles");
 // @route POST /posts
 // @desc Create post
 // @access private
-router.post("/", auth_check, (req, res) => {
-
-    const {errors, isValid} = validatePostInput(req.body);
-
-    //check validation
-    if (!isValid) {
-        return res.status(400).json(errors);
-    }
-
-    const newPost = new postModel ({
-        text : req.body.text,
-        name : req.user.name,
-        avatar : req.user.avatar,
-        user : req.user.id
-    });
-
-    newPost
-        .save()
-        .then(post => {
-            res.status(200).json({
-                msg : "successful posting",
-                postInfo : post
-            });
-        });
-});
+router.post("/", auth_check, postController.post_doPost);
 
 
 
 // @route GET /posts
 // @desc Get post
 // @access public
-router.get("/", (req, res) => {
-    postModel
-        .find()
-        .then(posts => {
-            const response = {
-                count : posts.length,
-                posts : posts.map(post => {
-                    return {
-                        id : post._id,
-                        name : post.name,
-                        text : post.text,
-                        avatar : post.avatar,
-                        likes : post.likes,
-                        comments : post.comments,
-                        date : post.date
-                    }
-                })
-            };
-
-            res.status(200).json(response);
-
-        });
-});
+router.get("/", postController.get_post_all);
 
 
 
@@ -74,16 +30,7 @@ router.get("/", (req, res) => {
 // @route GET /posts/:post_id
 // @desc Detail Get post
 // @access private
-router.get("/:post_id", auth_check, (req, res) => {
-    postModel
-        .findById(req.params.post_id)
-        .then(post => {
-            res.status(200).json({
-                msg : "successful detail post data",
-                postInfo : post
-            });
-        });
-});
+router.get("/:post_id", auth_check, postController.get_post_detail);
 
 
 
@@ -91,30 +38,7 @@ router.get("/:post_id", auth_check, (req, res) => {
 // @route POST /posts/
 // @desc update post
 // @access private
-router.post("/", auth_check, (req, res) => {
-
-    const postFields = {};
-    postFields.user = req.user.id;
-    if (req.body.text) postFields.text = req.body.text;
-
-    postModel
-        .findOne({user : req.user.id})
-        .then(post => {
-            postModel
-                .findOneAndUpdate(
-                    {user : req.user.id},
-                    {$set : postFields},
-                    {new : true}
-                )
-                .then(post => {
-                    res.status(200).json({
-                        msg : "update postInfo",
-                        postInfo : post
-                    });
-                });
-        });
-
-});
+router.post("/", auth_check, postController.post_update);
 
 
 
@@ -122,28 +46,7 @@ router.post("/", auth_check, (req, res) => {
 // @route DELETE /posts/:post_id
 // @desc Detail Delete post
 // @access private
-router.delete("/:post_id", auth_check, (req, res) => {
-    profileModel
-        .findOne({user : req.user.id})
-        .then(profile => {
-            postModel
-                .findById(req.params.post_id)
-                .then(post => {
-                    if (post.user.toString() !== req.user.id) {
-                        return res.status(400).json({
-                            msg : "user not authorized"
-                        });
-                    }
-                    post
-                        .remove()
-                        .then(() => {
-                            res.status(200).json({
-                                msg : "deleted post"
-                            });
-                        });
-                });
-        });
-});
+router.delete("/:post_id", auth_check, postController.delete_post);
 
 
 
@@ -151,33 +54,7 @@ router.delete("/:post_id", auth_check, (req, res) => {
 // @route POST /posts/like/:post_id
 // @desc Like post
 // @access private
-router.post("/like/:post_id", auth_check, (req, res) => {
-    profileModel
-        .findOne({user : req.user.id})
-        .then(profile => {
-            postModel
-                .findById(req.params.post_id)
-                .then(post => {
-                    if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
-                        return res.status(400).json({
-                            msg : "user already liked this post"
-                        });
-                    }
-                    post.likes.unshift({user : req.user.id});
-                    post.save()
-                        .then(post => {
-                            res.status(200).json({
-                                postInfo : post
-                            });
-                        });
-                })
-                .catch(err => {
-                    res.status(404).json({
-                        msg : "No post found"
-                    });
-                });
-        });
-});
+router.post("/like/:post_id", auth_check, postController.like_post);
 
 
 
@@ -186,38 +63,7 @@ router.post("/like/:post_id", auth_check, (req, res) => {
 // @route POST /posts/unlike/:post_id
 // @desc UnLike post
 // @access private
-router.post("/unlike/:post_id", auth_check, (req, res) => {
-    profileModel
-        .findOne({user : req.user.id})
-        .then(profile => {
-            postModel
-                .findById(req.params.post_id)
-                .then(post => {
-                    if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
-                        return res.status(400).json({
-                            msg : "You have not liked this post"
-                        });
-                    }
-                    const removeIndex = post.likes
-                        .map(item => item.user.toString())
-                        .indexOf(req.user.id);
-
-                    post.likes.splice(removeIndex, 1);
-
-                    //save
-                    post.save()
-                        .then(post => {
-                            res.status(200).json(post);
-
-                        });
-                })
-                .catch(err => {
-                    res.status(400).json({
-                        msg : "No post found"
-                    });
-                });
-        })
-});
+router.post("/unlike/:post_id", auth_check, postController.unlike_post);
 
 
 

@@ -2,6 +2,8 @@ const userModel = require("../models/users");
 const profileModel = require("../models/profiles");
 
 const validateProfileInput = require("../validation/profile");
+const validateExpInput = require("../validation/experience");
+const validateEduInput = require("../validation/education");
 
 
 
