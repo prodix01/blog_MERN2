@@ -4,12 +4,7 @@ const passport = require("passport");
 
 const auth_check = passport.authenticate("jwt", {session : false});
 
-const validatePostInput = require("../validation/post");
-
 const postController = require("../controllers/posts");
-
-const postModel = require("../models/posts");
-const profileModel = require("../models/profiles");
 
 
 // @route POST /posts
@@ -64,6 +59,22 @@ router.post("/like/:post_id", auth_check, postController.like_post);
 // @desc UnLike post
 // @access private
 router.post("/unlike/:post_id", auth_check, postController.unlike_post);
+
+
+
+
+// @route POST /posts/comment/:post_id
+// @desc Add comment to post
+// access private
+router.post("/comment/:post_id", auth_check, postController.post_comment);
+
+
+
+
+// @route DELETE /posts/comment/:post_id/:comment_id
+// @desc delete comment to post
+// access private
+router.delete("/comment/:post_id/:comment_id", auth_check, postController.delete_comment);
 
 
 
