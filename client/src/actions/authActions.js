@@ -40,3 +40,22 @@ export const loginUser = (userData, history) => dispatch => {
             })
         );
 };
+
+//Set logged in user
+export const setCurrentUser = decoded => {
+    return {
+        type: SET_CURRENT_USER,
+        payload: decoded
+    };
+};
+
+
+//log user out
+export const logoutUser = () => dispatch => {
+    //remove token from localStorage
+    localStorage.removeItem("jwtToken");
+
+    setAuthToken(false);
+
+    dispatch(setCurrentUser({}));
+};
